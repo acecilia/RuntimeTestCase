@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "ObjectiveKit",
+        "repositoryURL": "https://github.com/acecilia/ObjectiveKit",
+        "state": {
+          "branch": null,
+          "revision": "ee3121f040da27e892ccddc05b76fb3c328a0337",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

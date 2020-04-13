@@ -1,15 +1,12 @@
 import XCTest
+import ObjectiveKit
 
-public protocol RuntimeTestCaseProtocol0 {
+public protocol RuntimeTestSuiteProtocol {
     static var runtimeTestSuite: XCTestSuite { get }
 }
 
-@objc
-public protocol RuntimeTestCaseProtocol1 {
-    @objc func runtimeTest() throws
-}
-
-public protocol RuntimeTestCaseProtocol: XCTestCase & RuntimeTestCaseProtocol0 & RuntimeTestCaseProtocol1 {
+public protocol RuntimeTestCaseProtocol: XCTestCase & RuntimeTestSuiteProtocol {
+    static var runtimeTestSuite: XCTestSuite { get }
     static func testSpecs() -> [RuntimeTestCaseSpec<Self>]
 }
 
@@ -18,21 +15,20 @@ public extension RuntimeTestCaseProtocol {
         let suit = XCTestSuite(forTestCaseClass: Self.self)
 
         for testSpec in Self.testSpecs() {
-            let selector = #selector(Self.runtimeTest).customize(name: testSpec.name, Self.self)
+            // Create methods
+            let viewClass = ObjectiveClass<Self>()
+            let selector = viewClass.addMethod(testSpec.name) { testClass in
+                do {
+                    try testSpec.implementation(testClass as! Self)
+                } catch {
+                    XCTFail("\(error)")
+                }
+            }
+
             let testClass = Self.init(selector: selector)
-            testSpec.setup(testClass)
             suit.addTest(testClass)
         }
 
         return suit
-    }
-}
-
-private extension Selector {
-    func customize(name: String, _ target: AnyClass) -> Selector {
-        let method = class_getInstanceMethod(target, self)!
-        let customSelector = Selector(name)
-        class_addMethod(target, Selector(name), method_getImplementation(method), method_getTypeEncoding(method))
-        return customSelector
     }
 }
