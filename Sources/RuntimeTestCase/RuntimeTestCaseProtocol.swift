@@ -1,12 +1,13 @@
 import XCTest
 import ObjectiveKit
 
-public protocol RuntimeTestSuiteProtocol {
+/// Protocol not using generics, to be used inside RuntimeTestCaseClass
+public protocol RuntimeTestSuiteProtocol: XCTestCase {
     static var runtimeTestSuite: XCTestSuite { get }
 }
 
-public protocol RuntimeTestCaseProtocol: XCTestCase & RuntimeTestSuiteProtocol {
-    static var runtimeTestSuite: XCTestSuite { get }
+/// Protocol with generics, providing the rest of the requirements and the default implementation of the testSuite
+public protocol RuntimeTestCaseProtocol: RuntimeTestSuiteProtocol {
     static func testSpecs() -> [RuntimeTestCaseSpec<Self>]
 }
 
@@ -15,7 +16,6 @@ public extension RuntimeTestCaseProtocol {
         let suit = XCTestSuite(forTestCaseClass: Self.self)
 
         for testSpec in Self.testSpecs() {
-            // Create methods
             let viewClass = ObjectiveClass<Self>()
             let selector = viewClass.addMethod(testSpec.name) { testClass in
                 do {
