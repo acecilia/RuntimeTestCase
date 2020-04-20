@@ -5,7 +5,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest] # ubuntu-latest not working for now because we need objc support
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v2
